@@ -1,0 +1,54 @@
+.formBlock {
+  width: 410px;
+  width: 100%;
+  padding: 48px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.formBlock__icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 0 48px;
+}
+
+.formBlock__title {
+  @include h18;
+  color: $text-main;
+  margin: 0 0 15px;
+}
+
+.formBlock__desc {
+  @include b12;
+  color: $grey400;
+  margin: 0 0 36px;
+}
+
+.controls {
+  margin-bottom: 36px;
+}
+
+.controls__repeateBtn {
+  @include btn-reset;
+  @include h16;
+  margin-top: 24px;
+  color: $primary;
+  transition: color 0.3s;
+
+  &:not(:disabled):hover {
+    cursor: pointer;
+    color: $deep-blue;
+  }
+
+  &:disabled {
+    color: $grey300;
+  }
+}
+
+.controls__repeateCodeValue {
+  display: block;
+  @include b16;
+  margin-top: 4px;
+  color: $grey400;
+  text-align: center;
+}

@@ -1,0 +1,42 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  // display: flex;
+}
+
+body {
+  font-family: $font;
+  min-height: 100vh;
+}
+
+.wrapper {
+  max-width: $width-desktop;
+  margin: 0 auto;
+  padding-left: $desktop-gap;
+  padding-right: $desktop-gap;
+}
+
+input:not([type='checkbox']):not([type='radio']),
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+button {
+  &:active,
+  &:focus {
+    outline: none;
+  }
+}

@@ -1,0 +1,85 @@
+.auth {
+  height: 100vh;
+  background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0.25) 100%
+    ),
+    url('~@/assets/images/bedroom.jpg') center / cover no-repeat;
+
+  h1 {
+    color: red;
+  }
+}
+
+.auth__header {
+  padding: 24px 0;
+}
+
+.auth__wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth__main {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth__footer {
+  @include b12;
+  display: flex;
+  padding: 24px 0;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.auth__footerRoolsLink {
+  color: inherit;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: #fff;
+  }
+}
+
+.auth__formBlockOuter {
+  position: relative;
+  width: 410px;
+}
+
+.auth__formBlockInner {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.auth__goBack {
+  position: absolute;
+  top: 0;
+  left: -64px;
+  width: 48px;
+  height: 48px;
+  background-color: #fff;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1);
+  background-image: url('~@/assets/images/small-arrow.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform 0.2s;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:hover,
+  &:focus {
+    transform: scale(1.1);
+  }
+}
