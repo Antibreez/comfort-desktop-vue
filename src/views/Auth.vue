@@ -5,10 +5,19 @@
         <img src="@/assets/images/logo-white.svg" alt="Daichi" />
       </header>
       <main class="auth__main">
+        <phone-testing-banner
+          v-if="stage === 'EntranceForm' || stage === 'PhoneCodeForm'"
+        />
+
         <div class="auth__formBlockOuter">
           <div class="auth__formBlockInner">
+            <div id="recaptcha-container"></div>
             <button
-              v-if="stage === 'RegistrationForm' || stage === 'LoginForm'"
+              v-if="
+                stage === 'RegistrationForm' ||
+                stage === 'LoginForm' ||
+                stage === 'PhoneCodeForm'
+              "
               class="auth__goBack"
               aria-label="Перейти назад"
               @click.prevent="goToStart"
@@ -23,6 +32,10 @@
           </div>
         </div>
       </main>
+      <footer class="auth__footer">
+        <span>© Daichi 2021. Все права защищены.</span>
+        <a href="#" class="auth__footerRoolsLink">Правила и условия</a>
+      </footer>
     </div>
   </div>
 </template>
@@ -36,6 +49,8 @@ import LoginForm from '@/components/LoginForm'
 import PhoneCodeForm from '@/components/PhoneCodeForm'
 import {mutationTypes} from '@/store/modules/auth'
 
+import PhoneTestingBanner from '@/components/PhoneTestingBanner'
+
 export default {
   name: 'Auth',
   components: {
@@ -44,6 +59,7 @@ export default {
     RegistrationForm,
     LoginForm,
     PhoneCodeForm,
+    PhoneTestingBanner,
   },
   computed: {
     ...mapState({

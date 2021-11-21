@@ -1,6 +1,7 @@
 import firebase from '@/api/firebase'
 import {setItem} from '@/helpers/persistanceStorage'
 import validation from '@/helpers/validation'
+import codeCounter from '@/helpers/codeCounter'
 
 let confirmationResult
 
@@ -11,6 +12,7 @@ const state = {
   email: null,
   userUid: null,
   phone: null,
+  codeTimer: null,
 }
 
 export const mutationTypes = {
@@ -35,6 +37,7 @@ export const mutationTypes = {
   changeError: '[auth] changeError',
   changeStage: '[auth] changeStage',
   setUserUid: '[auth] setUserUid',
+  setCodeTimer: '[auth] setCodeTimer',
 }
 
 export const actionTypes = {
@@ -43,6 +46,7 @@ export const actionTypes = {
   emailLogin: '[auth] emailLogin',
   emailRegistration: '[auth] emailRegistration',
   phoneLogin: '[auth] phoneLogin',
+  codeTimerInit: '[auth] codeTimerInit',
 }
 
 const mutations = {
@@ -67,7 +71,6 @@ const mutations = {
   },
   [mutationTypes.entranceFailur](state) {
     state.isLoading = false
-    state.errorMessage = 'Произошла ошибка запроса'
   },
 
   //EMAIL LOGIN
@@ -94,16 +97,6 @@ const mutations = {
     state.isLoading = false
   },
 
-  [mutationTypes.changeError](state, payload) {
-    state.errorMessage = payload
-  },
-  [mutationTypes.changeStage](state, payload) {
-    state.stage = payload
-  },
-  [mutationTypes.setUserUid](state, payload) {
-    state.userUid = payload
-  },
-
   //PHONE LOGIN
   [mutationTypes.phoneLoginStart](state) {
     state.isLoading = true
@@ -115,6 +108,19 @@ const mutations = {
   [mutationTypes.phoneLoginFailur](state) {
     state.isLoading = false
   },
+
+  [mutationTypes.changeError](state, payload) {
+    state.errorMessage = payload
+  },
+  [mutationTypes.changeStage](state, payload) {
+    state.stage = payload
+  },
+  [mutationTypes.setUserUid](state, payload) {
+    state.userUid = payload
+  },
+  [mutationTypes.setCodeTimer](state, payload) {
+    state.codeTimer = payload
+  },
 }
 
 const actions = {
@@ -123,14 +129,18 @@ const actions = {
       context.commit(mutationTypes.entranceStart)
 
       // ПРОВЕРЯЕМ СУЩЕСТВУЕТ ЛИ ПОЛЬЗОВАТЕЛЬ. В ЗАВИСИМОСТИ ОТ РЕЗУЛЬАТА ПОЛУЧАЕМ СЛЕДУЮЩИЙ ЭТАП
-      firebase
+      firebase.auth
         .fetchSignInMethodsForEmail(email)
         .then(response => {
           response.length > 0
             ? context.commit(mutationTypes.entranceExistEmail, email)
             : context.commit(mutationTypes.entranceNewEmail, email)
         })
-        .catch(() => {
+        .catch(error => {
+          context.commit(
+            mutationTypes.changeError,
+            firebase.getErrorMessage(error)
+          )
           context.commit(mutationTypes.entranceFailur)
         })
     })
@@ -139,8 +149,8 @@ const actions = {
     return new Promise(resolve => {
       context.commit(mutationTypes.emailLoginStart)
 
-      firebase
-        .signWithEmail(email, password)
+      firebase.auth
+        .signInWithEmailAndPassword(email, password)
         .then(response => {
           const uid = response.user.uid
           context.commit(mutationTypes.emailLoginSuccess)
@@ -149,7 +159,11 @@ const actions = {
           resolve()
         })
         .catch(error => {
-          console.log(error)
+          console.log(error.code)
+          context.commit(
+            mutationTypes.changeError,
+            firebase.getErrorMessage(error)
+          )
           context.commit(mutationTypes.emailLoginFailur)
         })
     })
@@ -159,8 +173,8 @@ const actions = {
     return new Promise(resolve => {
       context.commit(mutationTypes.emailRegistrationStart)
 
-      firebase
-        .signUpWithEmail(email, password)
+      firebase.auth
+        .createUserWithEmailAndPassword(email, password)
         .then(response => {
           const uid = response.user.uid
           context.commit(mutationTypes.emailRegistrationSuccess)
@@ -170,15 +184,20 @@ const actions = {
         })
         .catch(error => {
           console.log(error)
+          context.commit(
+            mutationTypes.changeError,
+            firebase.getErrorMessage(error)
+          )
           context.commit(mutationTypes.emailRegistrationFailur)
         })
     })
   },
   [actionTypes.entranceCheckPhone](context, phone) {
-    return new Promise(() => {
+    return new Promise(resolve => {
       context.commit(mutationTypes.entranceStart)
 
       const appVerifier = firebase.getRecaptcha()
+      console.log(appVerifier)
       const properPhoneValue = validation.phone.getProperValue(phone)
 
       firebase.auth
@@ -186,10 +205,15 @@ const actions = {
         .then(confRes => {
           console.log(confRes)
           confirmationResult = confRes
-          context.commit(mutationTypes.entrancePhone)
+          context.commit(mutationTypes.entrancePhone, properPhoneValue)
+          resolve()
         })
         .catch(error => {
           console.log(error)
+          context.commit(
+            mutationTypes.changeError,
+            firebase.getErrorMessage(error)
+          )
           context.commit(mutationTypes.entranceFailur)
         })
     })
@@ -209,9 +233,35 @@ const actions = {
         })
         .catch(error => {
           console.log(error)
+          context.commit(
+            mutationTypes.changeError,
+            firebase.getErrorMessage(error)
+          )
           context.commit(mutationTypes.phoneLoginFailur)
         })
     })
+  },
+  [actionTypes.codeTimerInit](context) {
+    if (!codeCounter.get()) {
+      return
+    }
+
+    context.commit(mutationTypes.setCodeTimer, codeCounter.get())
+
+    codeCounter.timer = setInterval(() => {
+      console.log('timer')
+      let current = codeCounter.get()
+      current--
+
+      if (current < 0) {
+        clearInterval(codeCounter.timer)
+        codeCounter.remove()
+        context.commit(mutationTypes.setCodeTimer, null)
+      } else {
+        context.commit(mutationTypes.setCodeTimer, current)
+        codeCounter.set(current)
+      }
+    }, 1000)
   },
 }
 

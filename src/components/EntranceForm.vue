@@ -12,7 +12,6 @@
         приложении
       </p>
       <div>
-        <div id="recaptcha-container"></div>
         <div class="controls">
           <app-input
             label="Email или номер телефона"
@@ -33,6 +32,7 @@ import appButton from '@/components/Button'
 import appInput from '@/components/Input'
 import {mutationTypes, actionTypes} from '@/store/modules/auth'
 import {mapActions, mapMutations, mapState} from 'vuex'
+import codeCounter from '@/helpers/codeCounter'
 
 export default {
   name: 'EntranceControl',
@@ -48,21 +48,48 @@ export default {
   computed: {
     ...mapState({
       errorMessage: state => state.auth.errorMessage,
+      phone: state => state.auth.phone,
     }),
   },
   methods: {
     ...mapMutations({
       changeError: mutationTypes.changeError,
+      entrancePhone: mutationTypes.entrancePhone,
     }),
     ...mapActions({
       entranceFindEmail: actionTypes.entranceFindEmail,
       entranceCheckPhone: actionTypes.entranceCheckPhone,
+      codeTimerInit: actionTypes.codeTimerInit,
     }),
     onClick() {
       if (validation.email.isValid(this.entranceValue)) {
         this.entranceFindEmail(this.entranceValue)
       } else if (validation.phone.isValid(this.entranceValue)) {
-        this.entranceCheckPhone(this.entranceValue)
+        console.log(this.entranceValue, this.phone)
+
+        if (!codeCounter.get()) {
+          this.entranceCheckPhone(this.entranceValue).then(() => {
+            codeCounter.start()
+            this.codeTimerInit()
+          })
+        } else if (
+          codeCounter.get() &&
+          validation.phone.getProperValue(this.entranceValue) !== this.phone
+        ) {
+          this.entranceCheckPhone(this.entranceValue).then(() => {
+            clearInterval(codeCounter.timer)
+            codeCounter.start()
+            this.codeTimerInit()
+          })
+        } else if (
+          codeCounter.get() &&
+          validation.phone.getProperValue(this.entranceValue) === this.phone
+        ) {
+          this.entrancePhone(this.entranceValue)
+        }
+
+        // this.entranceCheckPhone(this.entranceValue)
+
         console.log('this is phone')
       } else {
         console.log('error')

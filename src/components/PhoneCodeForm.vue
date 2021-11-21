@@ -12,6 +12,18 @@
             :hasErrorMessage="true"
           />
           <app-button :onClick="onClick" text="Войти"></app-button>
+
+          <button
+            class="controls__repeateBtn"
+            @click.prevent="onRepeatClick"
+            :disabled="!!codeTimer"
+          >
+            Получить код повторно
+          </button>
+
+          <span class="controls__repeateCodeValue" v-if="codeTimer">
+            (через {{ codeTimer }} сек.)
+          </span>
         </div>
       </div>
     </form>
@@ -23,6 +35,7 @@ import appButton from '@/components/Button'
 import appInput from '@/components/Input'
 import {mapState, mapMutations, mapActions} from 'vuex'
 import {mutationTypes, actionTypes} from '@/store/modules/auth'
+import codeCounter from '@/helpers/codeCounter'
 
 export default {
   component: 'PhoneCondeForm',
@@ -38,6 +51,8 @@ export default {
   computed: {
     ...mapState({
       errorMessage: state => state.auth.errorMessage,
+      phone: state => state.auth.phone,
+      codeTimer: state => state.auth.codeTimer,
     }),
   },
   methods: {
@@ -46,10 +61,18 @@ export default {
     }),
     ...mapActions({
       phoneLogin: actionTypes.phoneLogin,
+      entranceCheckPhone: actionTypes.entranceCheckPhone,
+      codeTimerInit: actionTypes.codeTimerInit,
     }),
     onClick() {
       this.phoneLogin(this.password).then(() => {
         this.$router.push({name: 'Home'})
+      })
+    },
+    onRepeatClick() {
+      this.entranceCheckPhone(this.phone).then(() => {
+        codeCounter.start()
+        this.codeTimerInit()
       })
     },
     onInput(e) {

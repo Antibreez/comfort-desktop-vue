@@ -14,3 +14,7 @@ export const setItem = (key, data) => {
     console.log('Error saving data in localStorage', e)
   }
 }
+
+export const removeItem = key => {
+  localStorage.removeItem(key)
+}
