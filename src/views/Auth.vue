@@ -29,6 +29,7 @@
             <registration-form v-if="stage === 'RegistrationForm'" />
             <login-form v-if="stage === 'LoginForm'" />
             <phone-code-form v-if="stage === 'PhoneCodeForm'" />
+            <password-reset-form v-if="stage === 'PasswordResetForm'" />
           </div>
         </div>
       </main>
@@ -47,6 +48,7 @@ import EntranceForm from '@/components/EntranceForm'
 import RegistrationForm from '@/components/RegistrationForm'
 import LoginForm from '@/components/LoginForm'
 import PhoneCodeForm from '@/components/PhoneCodeForm'
+import PasswordResetForm from '@/components/PasswordResetForm'
 import {mutationTypes} from '@/store/modules/auth'
 
 import PhoneTestingBanner from '@/components/PhoneTestingBanner'
@@ -60,6 +62,7 @@ export default {
     LoginForm,
     PhoneCodeForm,
     PhoneTestingBanner,
+    PasswordResetForm,
   },
   computed: {
     ...mapState({

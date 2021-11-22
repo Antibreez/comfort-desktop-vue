@@ -2,7 +2,9 @@
   <div class="formBlock">
     <form>
       <h2 class="formBlock__title">Вход по номеру телефона</h2>
-      <p class="formBlock__desc">Мы отправили код подтверждения на номер</p>
+      <p class="formBlock__desc">
+        Мы отправили код подтверждения на номер {{ phone }}
+      </p>
       <div>
         <div class="controls">
           <app-input
@@ -11,7 +13,11 @@
             :onInput="onInput"
             :hasErrorMessage="true"
           />
-          <app-button :onClick="onClick" text="Войти"></app-button>
+          <app-button
+            :onClick="onClick"
+            text="Войти"
+            :disabled="password.trim() === '' || errorMessage.length > 0"
+          ></app-button>
 
           <button
             class="controls__repeateBtn"

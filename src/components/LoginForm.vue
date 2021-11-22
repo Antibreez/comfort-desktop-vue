@@ -11,7 +11,17 @@
             :onInput="onPasswordInput"
             :hasErrorMessage="true"
           />
-          <app-button :onClick="onClick" text="Войти"></app-button>
+          <app-button
+            :onClick="onClick"
+            text="Войти"
+            :disabled="password.trim() === '' || errorMessage.length > 0"
+          ></app-button>
+          <button
+            class="controls__repeateBtn"
+            @click.prevent="onForgotPassword"
+          >
+            Забыли пароль?
+          </button>
         </div>
       </div>
     </form>
@@ -48,6 +58,7 @@ export default {
     }),
     ...mapActions({
       emailLogin: actionTypes.emailLogin,
+      emailResetPassword: actionTypes.emailResetPassword,
     }),
     onClick() {
       if (!validation.password.isValid(this.password)) {
@@ -62,6 +73,9 @@ export default {
       this.password = e.target.value
 
       this.errorMessage && this.changeError('')
+    },
+    onForgotPassword() {
+      this.emailResetPassword(this.email)
     },
   },
 }

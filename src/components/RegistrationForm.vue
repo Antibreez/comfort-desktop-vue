@@ -19,7 +19,15 @@
             :onInput="onConfirmPasswordInput"
             :hasErrorMessage="true"
           />
-          <app-button :onClick="onClick" text="Зарегистрироваться"></app-button>
+          <app-button
+            :onClick="onClick"
+            text="Зарегистрироваться"
+            :disabled="
+              password.trim() === '' ||
+              confirmPassword.trim() === '' ||
+              errorMessage.length > 0
+            "
+          ></app-button>
         </div>
       </div>
     </form>

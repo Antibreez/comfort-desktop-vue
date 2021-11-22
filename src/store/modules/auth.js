@@ -25,6 +25,7 @@ export const mutationTypes = {
   emailLoginStart: '[auth] emailLoginStart',
   emailLoginSuccess: '[auth] emailLoginSuccess',
   emailLoginFailur: '[auth] emailLoginFailur',
+  emailForgotPassword: '[auth] emailForgotPassword',
 
   phoneLoginStart: '[auth] phoneLoginStart',
   phoneLoginSuccess: '[auth] phoneLoginSuccess',
@@ -33,6 +34,10 @@ export const mutationTypes = {
   emailRegistrationStart: '[auth] emailRegistrationStart',
   emailRegistrationSuccess: '[auth] emailRegistrationSuccess',
   emailRegistrationFailur: '[auth] emailRegistrationFailur',
+
+  emailResetPasswordStart: '[auth] emailResetPasswordStart',
+  emailResetPasswordSuccess: '[auth] emailResetPasswordSuccess',
+  emailResetPasswordFailur: '[auth] emailResetPasswordFailur',
 
   changeError: '[auth] changeError',
   changeStage: '[auth] changeStage',
@@ -45,6 +50,7 @@ export const actionTypes = {
   entranceCheckPhone: '[auth] entranceCheckPhone',
   emailLogin: '[auth] emailLogin',
   emailRegistration: '[auth] emailRegistration',
+  emailResetPassword: '[auth] emailResetPassword',
   phoneLogin: '[auth] phoneLogin',
   codeTimerInit: '[auth] codeTimerInit',
 }
@@ -84,6 +90,9 @@ const mutations = {
   [mutationTypes.emailLoginFailur](state) {
     state.isLoading = false
   },
+  [mutationTypes.emailForgotPassword](state) {
+    state.stage = 'ForgotPasswordForm'
+  },
 
   //EMAIL REGISTRATION
   [mutationTypes.emailRegistrationStart](state) {
@@ -94,6 +103,18 @@ const mutations = {
     state.userUid = payload
   },
   [mutationTypes.emailRegistrationFailur](state) {
+    state.isLoading = false
+  },
+
+  //EMAIL PASSWORD RESET
+  [mutationTypes.emailResetPasswordStart](state) {
+    state.isLoading = true
+  },
+  [mutationTypes.emailResetPasswordSuccess](state) {
+    state.isLoading = false
+    state.stage = 'PasswordResetForm'
+  },
+  [mutationTypes.emailResetPasswordFailur](state) {
     state.isLoading = false
   },
 
@@ -189,6 +210,25 @@ const actions = {
             firebase.getErrorMessage(error)
           )
           context.commit(mutationTypes.emailRegistrationFailur)
+        })
+    })
+  },
+  [actionTypes.emailResetPassword](context, email) {
+    return new Promise(() => {
+      context.commit(mutationTypes.emailResetPasswordStart)
+
+      firebase.auth
+        .sendPasswordResetEmail(email)
+        .then(() => {
+          context.commit(mutationTypes.emailResetPasswordSuccess)
+        })
+        .catch(error => {
+          console.log(error)
+          context.commit(
+            mutationTypes.changeError,
+            firebase.getErrorMessage(error)
+          )
+          context.commit(mutationTypes.emailResetPasswordFailur)
         })
     })
   },

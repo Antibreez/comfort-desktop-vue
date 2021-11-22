@@ -19,7 +19,11 @@
             :onInput="onInput"
             :hasErrorMessage="true"
           />
-          <app-button :onClick="onClick" text="Продолжить"></app-button>
+          <app-button
+            :onClick="onClick"
+            text="Продолжить"
+            :disabled="entranceValue.trim() === '' || errorMessage.length > 0"
+          ></app-button>
         </div>
       </div>
     </form>
